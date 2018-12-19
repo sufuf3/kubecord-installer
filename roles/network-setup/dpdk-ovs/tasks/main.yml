@@ -1,0 +1,122 @@
+---
+
+# pip install six for compile OVS
+- pip:
+    name: six
+  when: ovs_type == 'dpdk'
+
+### Public ###
+# Download OVS source
+- name: Public | download Open vSwitch source
+  get_url:
+    url: http://openvswitch.org/releases/openvswitch-{{ ovs_version }}.tar.gz
+    dest: /tmp
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'public'
+
+# tar dpdk source and move to /usr/src
+- name: Public | Extract public ovs into /usr/src
+  unarchive:
+    src: /tmp/openvswitch-{{ ovs_version }}.tar.gz
+    dest: /usr/src
+    remote_src: yes
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'public'
+
+- name: Public | Boot openvswitch
+  shell: cd /usr/src/openvswitch-{{ ovs_version }} && ./boot.sh
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'public'
+
+- name: Public | Config openvswitch
+  shell: cd /usr/src/openvswitch-{{ ovs_version }} && CFLAGS='-Ofast -g' ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --with-dpdk={{ DPDK_BUILD }}
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'public'
+
+- name: Public | make install openvswitch
+  shell: cd /usr/src/openvswitch-{{ ovs_version }} && make && sudo make install
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'public'
+
+### Private ###
+# tar dpdk private source on ansible host and move to /usr/src
+- name: Private | Extract private ovs into /usr/src
+  unarchive:
+    src: "{{ ovs_tar_path }}"
+    dest: /usr/src
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'private'
+
+- name: Private | Boot openvswitch
+  shell: cd /usr/src/{{ ovs_folder_name }} && ./boot.sh
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'private'
+
+- name: Private | Config openvswitch
+  shell: cd /usr/src/{{ ovs_folder_name }} && CFLAGS='-Ofast -g' ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --with-dpdk={{ DPDK_BUILD }}
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'private'
+
+- name: Private | make install openvswitch
+  shell: cd /usr/src/{{ ovs_folder_name }} && make && sudo make install
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'private'
+
+# create directories for openvswitch if it doesn't exist
+- name: Create /etc/openvswitch dir
+  file:
+    path: /etc/openvswitch
+    state: directory
+    mode: 0755
+  when: ovs_type == 'dpdk'
+
+- name: Create /var/run/openvswitch dir
+  file:
+    path: /var/run/openvswitch
+    state: directory
+    mode: 0755
+  when: ovs_type == 'dpdk'
+
+- name: Create //var/log/openvswitch dir
+  file:
+    path: /var/log/openvswitch
+    state: directory
+    mode: 0755
+  when: ovs_type == 'dpdk'
+
+### Create ovs database
+# Public
+- name: Public | Create openvswitch database
+  command: ovsdb-tool create /etc/openvswitch/conf.db /usr/src/openvswitch-{{ ovs_version }}/vswitchd/vswitch.ovsschema
+  ignore_errors: True
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'public'
+
+# Private
+- name: Private | Create openvswitch database
+  command: ovsdb-tool create /etc/openvswitch/conf.db /usr/src/{{ ovs_folder_name }}/vswitchd/vswitch.ovsschema
+  ignore_errors: True
+  when: ovs_type == 'dpdk' and ovs_access_mode == 'private'
+
+- name: Export ovs path
+  command: echo 'export PATH=$PATH:/usr/local/share/openvswitch/scripts' | sudo tee -a /root/.bashrc
+  when: ovs_type == 'dpdk'
+
+- name: Copy ovsdb-server file
+  template: src="ovsdb-server.service" dest=/etc/systemd/system/ovsdb-server.service
+  when: ovs_type == 'dpdk'
+
+- name: Copy ovs-vswitchd file
+  template: src="ovs-vswitchd.service" dest=/etc/systemd/system/ovs-vswitchd.service
+  when: ovs_type == 'dpdk'
+
+- name: Enable ovsdb-server
+  command: "{{ item }}"
+  with_items:
+    - systemctl enable ovsdb-server
+    - systemctl start ovsdb-server
+  when: ovs_type == 'dpdk'
+
+- name: enable ovs-vswitchd
+  command: "{{ item }}"
+  with_items:
+    - systemctl enable ovs-vswitchd
+    - systemctl start ovs-vswitchd
+  when: ovs_type == 'dpdk'
+
+# Make openvswitch installations persist across reboots
+- name: Add openvswitch into /etc/modules
+  shell: "{{ item }}"
+  with_items:
+    - echo "openvswitch" | sudo tee -a /etc/modules
+  when: ovs_type == 'dpdk'

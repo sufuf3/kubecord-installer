@@ -5,6 +5,7 @@
   roles:
     - { role: network-setup/grub, when: default_hugepagesz == '1G' or sriov == 'true'}
     - { role: network-setup/dpdk, when: ovs_type == 'dpdk', tags: dpdk }
+    - { role: network-setup/dpdk-ovs, when: ovs_type == 'dpdk', tags: dpdk-ovs }
 
 # The inventory.sample is
 # [network-setup]

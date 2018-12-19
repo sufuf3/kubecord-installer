@@ -1,0 +1,4 @@
+DPDK_DIR: /usr/src/dpdk-stable-{{ dpdk_version }}
+LD_LIBRARY_PATH: /usr/src/dpdk-stable-{{ dpdk_version }}/x86_64-native-linuxapp-gcc/lib
+DPDK_TARGET: x86_64-native-linuxapp-gcc
+DPDK_BUILD: /usr/src/dpdk-stable-{{ dpdk_version }}/x86_64-native-linuxapp-gcc
