@@ -1,0 +1,9 @@
+---
+
+- name: ovs - Remove OVS
+  include_tasks: ovs.yml
+  when: ansible_os_family == 'Debian'
+
+- name: dpdk - Remove DPDK
+  include_tasks: dpdk.yml
+  when: ansible_os_family == 'Debian' or ovs_type == 'dpdk'

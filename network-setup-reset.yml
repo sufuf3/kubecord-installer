@@ -1,0 +1,14 @@
+---
+
+- hosts: network-setup
+  become: yes
+  roles:
+    - { role: network-setup/reset, tags: reset-ovs }
+
+
+# The inventory.sample is
+# [network-setup]
+# X.X.X.X
+# X.X.X.X
+
+# try: `ansible-playbook -e "@inventory/group_vars/network-setup.yml" --inventory inventory/inventory.ini network-setup-reset.yml -vvvv`

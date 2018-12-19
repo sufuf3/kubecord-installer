@@ -1,0 +1,47 @@
+---
+
+- name: Get dpdk-devbind status
+  shell: cd ~/ && {{ DPDK_DIR }}/usertools/dpdk-devbind.py --status
+  when: ovs_type == 'dpdk'
+
+### Remove device kernel modules ###
+# Unbind devices from IGB UIO driver
+- name: Remove IGB UIO module
+  shell: /sbin/rmmod igb_uio
+  ignore_errors: True
+  when: kernel_module == 'igb_uio' and ovs_type == 'dpdk'
+
+# Unbind devices from VFIO driver
+- name: Remove VFIO module
+  shell: "{{ item }}"
+  with_items:
+    - /sbin/rmmod vfio-pci
+    - /sbin/rmmod vfio_iommu_type1
+    - /sbin/rmmod vfio
+  ignore_errors: True
+  when: kernel_module == 'vfio-pci' and ovs_type == 'dpdk'
+
+# Unbind devices from KNI driver
+- name: Remove KNI module
+  shell: /sbin/rmmod rte_kni
+  ignore_errors: True
+  when: kernel_module == 'knio' and ovs_type == 'dpdk'
+
+# Remove hugepage mappings
+- name: Unmount hugepage
+  command: umount /dev/hugepages
+  when: ovs_type == 'dpdk'
+  ignore_errors: True
+
+- name: Remove export variable
+  shell: "{{ item }}"
+  with_items:
+    - sed -i '/DPDK_DIR/d' ~/.bashrc
+    - sed -i '/LD_LIBRARY_PATH/d' ~/.bashrc
+    - sed -i '/DPDK_TARGET/d' ~/.bashrc
+    - sed -i '/DPDK_BUILD/d' ~/.bashrc
+    - sed -i '/IFDRV_/d' ~/.bashrc
+    - sed -i '/IFnum_/d' ~/.bashrc
+    - sed -i '/uio/d' /etc/modules
+    - sed -i '/igb_uio/d' /etc/modules
+    - sed -i '/vfio-pci/d' /etc/modules
