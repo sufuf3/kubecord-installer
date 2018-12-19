@@ -1,0 +1,29 @@
+---
+
+- name: Get Kernel version
+  shell: uname -r
+  register: kernel_version_output
+
+# Add the kernel module of driver, like UIO
+- name: Add vfio-pci kernel module of driver
+  modprobe:
+    name: vfio-pci
+    state: present
+  when: kernel_module == 'vfio-pci' and ovs_type == 'dpdk'
+
+# Insert igb_uio when kernal_module is UIO
+- name: Load vfio-pci kernel module
+  shell: "{{ item }}"
+  with_items:
+    - chmod a+x /dev/vfio
+    - chmod 0666 /dev/vfio/*
+  when: kernel_module == 'vfio-pci' and ovs_type == 'dpdk'
+
+# Make vfio-pci installations persist across reboots
+- name: Load vfio-pci when rboot
+  shell: "{{ item }}"
+  with_items:
+    - depmod -a
+    - echo "vfio-pci" | sudo tee -a /etc/modules
+  when: kernel_module == 'vfio-pci' and ovs_type == 'dpdk'
+

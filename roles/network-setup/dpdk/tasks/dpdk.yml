@@ -1,0 +1,75 @@
+---
+
+- name: Get installed docker
+  shell: dpkg -l | grep -i docker | awk '{print $2}'
+  register: installed_docker
+
+# apt dist-update when there is no docker package
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+  when: installed_docker.stdout == "" and ansible_os_family == 'Debian' or ovs_type == 'dpdk'
+
+- name: Get Kernel version
+  shell: uname -r
+  register: kernel_version_output
+
+# Install DPDK required packages
+- name: Ensure DPDK utilities are installed.
+  apt: "name={{ item }} state=installed"
+  with_items:
+    - vim
+    - git
+    - clang
+    - doxygen
+    - hugepages
+    - build-essential
+    - libnuma-dev
+    - libpcap-dev
+    - linux-headers-{{ kernel_version_output.stdout }}
+    - dh-autoreconf
+    - libssl-dev
+    - libcap-ng-dev
+    - openssl
+    - python
+    - python-pip
+    - htop
+  when: ansible_os_family == 'Debian' or ovs_type == 'dpdk'
+
+- name: Mark linux kernel as held back, prevent kernel version from being automatically installed, upgraded or removed.
+  shell: sudo apt-mark hold {{ kernel_version_output.stdout }}
+
+# Download DPDK source
+- name: download DPDK source
+  get_url:
+    url: https://fast.dpdk.org/rel/dpdk-{{ dpdk_version }}.tar.xz
+    dest: /tmp
+  when: ovs_type == 'dpdk'
+
+# tar dpdk source and move to /usr/src
+- name: Extract dpdk into /usr/src
+  unarchive:
+    src: /tmp/dpdk-{{ dpdk_version }}.tar.xz
+    dest: /usr/src
+    remote_src: yes
+  when: ovs_type == 'dpdk'
+
+# Install DPDK
+- name: Setting environment values
+  shell: "{{ item }}"
+  with_items:
+    - echo 'export DPDK_DIR=/usr/src/dpdk-stable-{{ dpdk_version }}' | sudo tee -a /root/.bashrc
+    - echo 'export LD_LIBRARY_PATH=$DPDK_DIR/x86_64-native-linuxapp-gcc/lib' | sudo tee -a /root/.bashrc
+    - echo 'export DPDK_TARGET=x86_64-native-linuxapp-gcc' | sudo tee -a /root/.bashrc
+    - echo 'export DPDK_BUILD=$DPDK_DIR/$DPDK_TARGET' | sudo tee -a /root/.bashrc
+  when: ovs_type == 'dpdk'
+
+# Using arguments to build DPDK
+- name: Make install DPDK
+  shell: cd {{ DPDK_DIR }} && sudo make install T={{ DPDK_TARGET }} DESTDIR=install
+  when: ovs_type == 'dpdk'
+
+# Export the DPDK shared library location
+- name: Setting environment values
+  command: sed -i 's/CONFIG_RTE_BUILD_SHARED_LIB=n/CONFIG_RTE_BUILD_SHARED_LIB=y/g' {{ DPDK_DIR }}/config/common_base
+  when: ovs_type == 'dpdk'

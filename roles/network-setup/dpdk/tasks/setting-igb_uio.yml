@@ -1,0 +1,29 @@
+---
+
+- name: Get Kernel version
+  shell: uname -r
+  register: kernel_version_output
+
+# Add the kernel module of driver, like UIO
+- name: Add the kernel module of driver
+  modprobe:
+    name: uio
+    state: present
+  when: kernel_module == 'igb_uio' and ovs_type == 'dpdk'
+
+# Insert igb_uio when kernal_module is UIO
+- name: Insert igb_uio when kernal_module is UIO
+  command: insmod {{ DPDK_DIR }}/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko
+  ignore_errors: True
+  when: kernel_module == 'igb_uio' and ovs_type == 'dpdk'
+
+# Make uio and igb_uio installations persist across reboots
+- name: Insert igb_uio when kernal_module is UIO
+  shell: "{{ item }}"
+  with_items:
+    - ln -sf {{ DPDK_DIR }}/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko /lib/modules/{{ kernel_version_output.stdout }}
+    - depmod -a
+    - echo "uio" | sudo tee -a /etc/modules
+    - echo "igb_uio" | sudo tee -a /etc/modules
+  when: kernel_module == 'igb_uio' and ovs_type == 'dpdk'
+

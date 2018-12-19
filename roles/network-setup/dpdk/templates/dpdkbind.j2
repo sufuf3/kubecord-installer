@@ -1,0 +1,38 @@
+#!/bin/bash
+# Projet: Vortex
+# Author: Linker Networks Inc.
+# Date: 2018/08/07
+#
+# Execute example:
+#    $ chmod +x dpdkbink.sh
+#    $ ./dpdkbink.sh enp0s10,enp0s17
+
+NET_IF_NAME="$1"
+
+split_net_if_name() {
+        IF_NAME=$(echo "$NET_IF_NAME" | tr "," "\n")
+    }
+
+if_down() {
+            split_net_if_name "$NET_IF_NAME"
+            for i in $IF_NAME
+            do
+                    echo "=== Start === ifconfig $i down"
+                    sudo ifconfig "${i}" down
+                    echo "===  End  === ifconfig $i down"
+            done
+    }
+
+
+bind_port() {
+            split_net_if_name "$NET_IF_NAME"
+            for i in $IF_NAME
+            do
+                echo "=== Start === dpdk-devbind.py --bind={{ kernel_module }} $i"
+                sudo /usr/src/dpdk-stable-{{ dpdk_version }}/usertools/dpdk-devbind.py --bind={{ kernel_module }} "${i}"
+                echo "===  End  === dpdk-devbind.py --bind={{ kernel_module }} $i"
+            done
+    }
+
+if_down "$NET_IF_NAME"
+bind_port "$NET_IF_NAME"

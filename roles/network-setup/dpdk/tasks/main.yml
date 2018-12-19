@@ -1,0 +1,22 @@
+---
+
+- name: dpdk - Install DPDK
+  include_tasks: dpdk.yml
+
+- name: setting-kmod | Set igb_uio Linux kernel module
+  include_tasks: setting-igb_uio.yml
+  when: kernel_module == 'igb_uio' and ovs_type == 'dpdk'
+
+- name: setting-kmod | Set vfio-pci Linux kernel module
+  include_tasks: setting-vfio-pci.yml
+  when: kernel_module == 'vfio-pci' and ovs_type == 'dpdk'
+
+# Bind dpdk port manually via shell script
+- name: Copy dpdkbind.sh file
+  template:
+    src: dpdkbind.j2
+    dest: "/usr/bin/dpdkbind"
+    owner: root
+    group: root
+    mode: 0755
+  when: ovs_type == 'dpdk'
