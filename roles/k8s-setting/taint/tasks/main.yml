@@ -1,0 +1,3 @@
+- name: Enable to schedule pods on the master(taint)
+  shell: kubectl taint nodes --all node-role.kubernetes.io/master-
+  when: taint_enabled == 'true'
