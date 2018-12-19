@@ -1,0 +1,24 @@
+---
+
+- hosts: local
+  roles:
+    - variables
+
+- hosts: k8s-cluster:children
+  roles:
+    - common
+
+- hosts: kube-master
+  roles:
+    - precheck
+    - master
+
+- hosts: k8s-cluster:children
+  roles:
+    - node
+
+- import_playbook: kubespray/cluster.yml
+
+- hosts: kube-master
+  roles:
+    - { role: k8s-setting/taint, when: taint_enabled == 'true', tags: taint }
