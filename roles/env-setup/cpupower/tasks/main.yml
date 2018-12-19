@@ -1,0 +1,22 @@
+---
+# Ref: http://www.webupd8.org/2014/04/prevent-your-laptop-from-overheating.html
+
+- name: Get Kernel version
+  shell: uname -r
+  register: kernel_version_output
+
+- name: Install cpufrequtils
+  apt: "name={{ item }} state=installed"
+  with_items:
+    - linux-cloud-tools-{{ kernel_version_output.stdout }}
+    - linux-tools-{{ kernel_version_output.stdout }}
+    - cpufrequtils
+
+- name: make the "performance" governor default in Ubuntu
+  shell: sudo sed -i 's/^GOVERNOR=.*/GOVERNOR="performance"/' /etc/init.d/cpufrequtils
+
+- name: Disable ondemand
+  shell: systemctl disable ondemand.service
+
+- name: Use the "performance" cpufreq intel_pstate governor
+  shell: cpupower -c all frequency-set -g performance
