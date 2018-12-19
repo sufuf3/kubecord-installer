@@ -1,0 +1,81 @@
+---
+
+- name: Info | Get OS info
+  shell: cat /etc/lsb-release
+  register: os_result
+
+- name: Info | Print OS info
+  debug:
+    msg: "{{ os_result.stdout.split('\n') }}"
+
+- name: Info | Get Kernel info
+  shell: uname -msr
+  register: kernel_result
+
+- name: Info | Print kernel info
+  debug:
+    msg: "{{ kernel_result.stdout }}"
+
+- name: Info | Get showhold
+  shell: sudo apt-mark showhold
+  register: show_hold
+
+- name: Info | Print showhold
+  debug:
+    msg: "{{ show_hold.stdout.split('\n') }}"
+
+- name: Info | Get Hugepage info
+  shell: cat /proc/meminfo | grep Huge
+  register: hp_result
+
+- name: Info | Print Hugepage info
+  debug:
+    msg: "{{ hp_result.stdout.split('\n') }}"
+
+- name: Info | Get CPU info
+  shell: cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+  register: cpu_result
+
+- name: Info | Print cpu info
+  debug:
+    msg: "{{ cpu_result.stdout.split('\n') }}"
+
+- name: SR-IOV | Get VF info
+  shell: head -n 1 /sys/class/net/en[a-z]*/device/sriov_totalvfs
+  register: vf_result
+
+- name: SR-IOV | print VF numbero
+  debug:
+    msg: "{{ vf_result.stdout.split('\n') }}"
+
+- name: DPDK | Get dpdk info
+  shell: cd /usr/src/dpdk-stable-{{ dpdk_version }} && pwd
+  register: dpdk_result
+
+- name: DPDK | Print dpdk info
+  debug:
+    msg: "{{ dpdk_result.stdout }}"
+
+- name: OVS | Get ovs info
+  shell: sudo ovs-vsctl show
+  register: ovs_result
+
+- name: OVS | Print ovs info
+  debug:
+    msg: "{{ ovs_result.stdout.split('\n') }}"
+
+- name: OVS | Get ovsdb-server.service info
+  shell: systemctl status ovsdb-server.service --no-pager
+  register: ovsdb_result
+
+- name: OVS | Print ovsdb-server.service info
+  debug:
+    msg: "{{ ovsdb_result.stdout.split('\n') }}"
+
+- name: OVS | Get ovs-vswitchd.service info
+  shell: systemctl status ovs-vswitchd.service --no-pager
+  register: vswitchd_result
+
+- name: OVS | Print ovs-vswitchd.service info
+  debug:
+    msg: "{{ vswitchd_result.stdout.split('\n') }}"
