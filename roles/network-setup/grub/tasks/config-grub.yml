@@ -1,0 +1,28 @@
+---
+
+- name: Copy the original grub file to grub.old
+  shell: cp /etc/default/grub /etc/default/grub.old
+  when: (ansible_os_family == 'Debian' and ovs_type == 'dpdk' and default_hugepagesz == '1G') or (ansible_os_family == 'Debian' and sriov == 'true')
+
+- name: Copy grub file
+  template: src="grub" dest=/etc/default/grub
+  when: (ansible_os_family == 'Debian' and ovs_type == 'dpdk' and default_hugepagesz == '1G') or (ansible_os_family == 'Debian' and sriov == 'true')
+
+- name: Update grub
+  shell: update-grub
+  when: (ansible_os_family == 'Debian' and ovs_type == 'dpdk' and default_hugepagesz == '1G') or (ansible_os_family == 'Debian' and sriov == 'true')
+  register: task_result
+
+- name: Reboot immediately if there was a change.
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  when: task_result is changed
+
+- name: Wait for the reboot to complete if update-grub finish.
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
+  when: task_result is changed

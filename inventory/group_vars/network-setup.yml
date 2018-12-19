@@ -1,0 +1,49 @@
+---
+
+##### Network Setting #####
+
+# OVS type setting,
+# Supported: ovs, dpdk. ("ovs" is for pure ovs, "dpdk" is for dpdk + ovs)
+ovs_type: dpdk
+
+
+
+##### DPDK setting #####
+
+# DPDK version: eg. 17.11.4
+dpdk_version: 17.11.4
+
+# Default hugepage size setting
+# Supported: 1G, 2M
+default_hugepagesz: 1G
+
+# Allocate a number of Huge pages
+nr_hugepages: 8
+
+
+
+##### SR-IOV setting #####
+
+# If you want to the machine support SR-IOV VF, set sriov as true
+sriov: true
+
+
+##### Open vSwitch install #####
+
+# ovs_access_mode: Is ovs tar file can be access? (public or private)
+ovs_access_mode: public
+
+# Open vSwitch version, If ovs_access_mode is public, please set ovs_version.
+ovs_version: 2.9.2
+
+# ovs_tar_path: If ovs_access_mode is private, you need to setting ovs_tar_path which is in ansible host. (No '/' in the end line.)
+# Also, please make sure there is a *.tar.gz in the right path before run ansible-playbook
+ovs_tar_path: xxx.tar.gz
+ovs_folder_name: xxx
+
+
+
+##### Kernel module #####
+
+# igb_uio or vfio-pci
+kernel_module: vfio-pci

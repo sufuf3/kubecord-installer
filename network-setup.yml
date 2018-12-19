@@ -1,0 +1,13 @@
+---
+
+- hosts: network-setup
+  become: yes
+  roles:
+    - { role: network-setup/grub, when: default_hugepagesz == '1G' or sriov == 'true'}
+
+# The inventory.sample is
+# [network-setup]
+# X.X.X.X
+# X.X.X.X
+
+# try: `ansible-playbook -e "@inventory/group_vars/network-setup.yml" --inventory inventory/inventory.ini network-setup.yml -vvvv`

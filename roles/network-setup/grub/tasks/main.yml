@@ -1,0 +1,8 @@
+---
+
+- name: grub | config-grub - Configure hugepage size as 1G
+  include_tasks: config-grub.yml
+  when: default_hugepagesz == '1G'
+
+- name: grub | config-hugepages - Configure hugepages
+  include_tasks: config-hugepages.yml

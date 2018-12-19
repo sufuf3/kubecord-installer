@@ -1,0 +1,19 @@
+---
+
+# echo 'vm.nr_hugepages=1024' | sudo tee /etc/sysctl.d/hugepages.conf
+- name: Setting hugepage sizes
+  shell: echo 'vm.nr_hugepages={{ nr_hugepages }}' | sudo tee /etc/sysctl.d/hugepages.conf
+  when: ansible_os_family == 'Debian' and ovs_type == 'dpdk'
+
+# mount -t hugetlbfs none /dev/hugepages
+- name: Mount hugepages
+  command: mount -t hugetlbfs none /dev/hugepages
+  when: ovs_type == 'dpdk'
+
+# sysctl -w vm.nr_hugepages=1024
+# Set vm.nr_hugepages to  in sysctl.conf
+- sysctl:
+    name: vm.nr_hugepages
+    value: "{{ nr_hugepages }}"
+    state: present
+  when: ovs_type == 'dpdk'
