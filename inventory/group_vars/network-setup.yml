@@ -18,7 +18,7 @@ dpdk_version: 17.11.4
 default_hugepagesz: 1G
 
 # Allocate a number of Huge pages
-nr_hugepages: 8
+nr_hugepages: 4
 
 
 
