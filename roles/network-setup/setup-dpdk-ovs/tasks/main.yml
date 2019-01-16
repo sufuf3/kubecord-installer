@@ -1,0 +1,10 @@
+# Setup Open_vSwitch
+- name: Setup other_config of Open_vSwitch
+  command: "{{ item }}"
+  with_items:
+    - ovs-vsctl --no-wait init
+    - ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-init={{ dpdk_init }}
+    - ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-socket-mem={{ dpdk_socket_mem }}
+    - ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask={{ cpu_mask }}
+    - ovs-vsctl --no-wait set Open_vSwitch . other_config:max-idle={{ max_idle }}
+  when: ovs_type == 'dpdk'

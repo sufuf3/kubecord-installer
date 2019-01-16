@@ -1,0 +1,7 @@
+- import_tasks: ssh-key.yml
+
+- import_tasks: package.yml
+
+- import_tasks: docker.yml
+
+- import_tasks: pip-package.yml

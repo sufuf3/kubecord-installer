@@ -1,0 +1,6 @@
+---
+
+# pip install yq for Helm
+- name: pip install yq for Helm
+  pip:
+    name: yq

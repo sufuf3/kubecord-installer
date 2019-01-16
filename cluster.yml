@@ -1,9 +1,5 @@
 ---
 
-- hosts: local
-  roles:
-    - variables
-
 - hosts: k8s-cluster:children
   roles:
     - common

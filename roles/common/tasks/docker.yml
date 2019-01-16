@@ -1,0 +1,43 @@
+- name: install docker dependencies
+  become: yes
+  become_method: sudo
+  apt: 
+    name: "{{ item }}"
+  with_items:
+    - "apt-transport-https"
+    - "ca-certificates"
+    - "software-properties-common"
+    - "curl"
+
+- name: add docker apt-key
+  become: yes
+  become_method: sudo
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: add docker apt fingerprint
+  become: yes
+  become_method: sudo
+  command: apt-key fingerprint 0EBFCD88
+
+- name: add docker apt repository
+  become: yes
+  become_method: sudo
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+    state: present
+
+- name: install docker-ce
+  become: yes
+  become_method: sudo
+  apt:
+    name: docker-ce={{ docker_version }}
+    update_cache: yes
+
+- name: create docker daemon setting file if not exists
+  copy:
+    content: "{}"
+    dest: /etc/docker/daemon.json
+    force: no
+
