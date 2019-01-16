@@ -9,10 +9,6 @@
     - { role: network-setup/dpdk-ovs, when: ovs_type == 'dpdk', tags: dpdk-ovs }
     - { role: network-setup/check-all, when: ovs_type == 'dpdk', tags: dpdk-ovs }
 
-- hosts: local
-  roles:
-    - variables
-
 - hosts: k8s-cluster:children
   roles:
     - common
