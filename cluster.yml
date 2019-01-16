@@ -7,11 +7,6 @@
 - hosts: kube-master
   roles:
     - precheck
-    - master
-
-- hosts: k8s-cluster:children
-  roles:
-    - node
 
 - import_playbook: kubespray/cluster.yml
 
