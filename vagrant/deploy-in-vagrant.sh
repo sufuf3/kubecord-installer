@@ -6,8 +6,8 @@
 # - virtualbox
 # - vagrant
 
-#vagrant plugin install vagrant-vbguest vagrant-disksize
-#vagrant up
+vagrant plugin install vagrant-vbguest vagrant-disksize
+vagrant up
 
 vagrant ssh node-1 --command 'git clone https://github.com/sufuf3/kubecord-installer.git'
 
