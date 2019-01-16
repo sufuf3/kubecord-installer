@@ -5,6 +5,7 @@
 
 ## Table of Contents
 
+- [Quick Start for Testing](#quick-start-for-testing)
 - [Step by Step for KubeCORD installation](#step-by-step-for-kubecord-installation)
   - [Manchine Requirements](#manchine-requirements)
   - [Preparation work on _each host_](#preparation-work-on-each-host)
@@ -22,6 +23,21 @@
   - [Reset cluster](#reset-cluster)
 - [Check Kubernetes Cluster](#check-kubernetes-cluster)
 - [Other Details](#other-details)
+
+## Quick Start for Testing
+
+- Deploy a vortex on localhost with Vagrant and VirtualBox
+- Not for production. Test purpose only.
+  - [Install Virtualbox](https://www.virtualbox.org/wiki/Downloads)
+  - [Install Vagrant](https://www.vagrantup.com/downloads.html)
+  - Ref: https://github.com/sufuf3/hands-on-w-tutorials/tree/master/2019-01-03#requirements
+
+```bash
+git clone https://github.com/sufuf3/kubecord-installer.git
+
+cd kubecord-installer && sh deploy-in-vagrant.sh
+```
+
 
 ## Step by Step for KubeCORD installation
 ### Manchine Requirements
