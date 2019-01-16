@@ -1,0 +1,72 @@
+# -*- mode: ruby -*-
+# vi:set ft=ruby sw=2 ts=2 sts=2:
+# Create vm
+# node-1: 192.168.26.11
+# node-2: 192.168.26.12
+# node-3: 192.168.26.13
+# ...
+
+NUM_NODE = 3
+NODE_IP_NW = "192.168.26."
+DISK_SIZE = "100" # 100MB
+PRIVATE_KEY_PATH = "inventory/keys"
+PRIVATE_KEY = "#{PRIVATE_KEY_PATH}/id_rsa"
+
+Vagrant.configure("2") do |config|
+
+  # linkernetworks/aurora-base is a virtualbox with pre-install pacakges:
+  #   docker-ce=17.12.1~ce-0~ubuntu 
+  #   pip, glusterfs
+  #config.vm.box = "linkernetworks/aurora-base"
+  #config.vm.box_version = "0.0.6"
+
+  config.vm.box = "ubuntu/xenial64"
+
+  config.vm.box_check_update = false
+  config.vbguest.auto_update = false
+
+  # Generate ssh key at .ssh
+  unless File.exist?("#{PRIVATE_KEY}")
+    `mkdir -p #{PRIVATE_KEY_PATH} && ssh-keygen -b 2048 -f #{PRIVATE_KEY} -t rsa -q -N ''`
+  end
+  config.vm.provision "file", source: "#{PRIVATE_KEY}.pub", destination: "id_rsa.pub"
+  config.vm.provision "append-public-key", :type => "shell", inline: "cat id_rsa.pub >> ~/.ssh/authorized_keys"
+
+  config.vm.provision "shell", privileged: true, inline: <<-SHELL
+    apt-get update && apt-get install -y python make
+  SHELL
+
+  #config.vm.provision "setup-hosts", :type => "shell", :path => "../scripts/vagrant/setup-hosts" do |s|
+  #  s.args = ["enp0s8"]
+  #end
+  
+  (1..NUM_NODE).each do |i|
+    config.vm.define "node-#{i}" do |node|
+
+      node.vm.hostname = "node-#{i}"
+      node_ip = NODE_IP_NW + "#{10 + i}"
+      dpdk_ip = NODE_IP_NW + "#{15 + i}"
+      node.vm.network :private_network, ip: node_ip
+      node.vm.network "private_network", ip: dpdk_ip
+
+      # Add disk for gluster client
+      node.vm.provider "virtualbox" do |vb|
+        unless File.exist?("disk-#{i}.vmdk")
+          vb.customize ["createhd", "--filename", "disk-#{i}.vmdk", "--size", DISK_SIZE]
+        end
+        vb.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', "disk-#{i}.vmdk"]
+        vb.customize ["modifyvm", :id, "--cpus", 2]
+        vb.customize ["modifyvm", :id, "--memory", 3072]
+        vb.customize ['modifyvm', :id, '--nicpromisc2', 'allow-all']
+        vb.customize ["setextradata", :id, "VBoxInternal/CPUM/SSE4.1", "1"]
+        vb.customize ["setextradata", :id, "VBoxInternal/CPUM/SSE4.2", "1"]
+      end #vb
+
+      # copy ssh key to vms
+      config.vm.provision "file", source: "#{PRIVATE_KEY}.pub", destination: "id_rsa.pub"
+      config.vm.provision "file", source: "#{PRIVATE_KEY}", destination: "id_rsa"
+
+    end #node-i
+  end #each node
+
+end
