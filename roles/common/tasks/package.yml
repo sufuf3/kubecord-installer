@@ -8,6 +8,9 @@
     - "ca-certificates"
     - "software-properties-common"
     - "curl"
+    - "python"
+    - "python-pip"
+    - "python-setuptools"
     - "jq"
 
 - name: install Helm dependencies
@@ -17,11 +20,3 @@
     name: "{{ item }}"
   with_items:
     - "socat"
-
-- name: install NFS dependencies
-  become: yes
-  become_method: sudo
-  apt: 
-    name: "{{ item }}"
-  with_items:
-    - "nfs-common"

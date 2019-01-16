@@ -16,7 +16,7 @@ kube_token_dir: "{{ kube_config_dir }}/tokens"
 # This is where to save basic auth file
 kube_users_dir: "{{ kube_config_dir }}/users"
 
-kube_api_anonymous_auth: true
+#kube_api_anonymous_auth: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
 kube_version: v1.12.4
@@ -194,3 +194,7 @@ persistent_volumes_enabled: false
 # nvidia_driver_version: "384.111"
 ## flavor can be tesla or gtx
 # nvidia_gpu_flavor: gtx
+
+# Enable to schedule pods on the master
+# For `kubectl taint nodes --all node-role.kubernetes.io/master-`
+taint_enabled: true

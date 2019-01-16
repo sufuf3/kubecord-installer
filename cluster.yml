@@ -4,10 +4,6 @@
   roles:
     - common
 
-- hosts: kube-master
-  roles:
-    - precheck
-
 - import_playbook: kubespray/cluster.yml
 
 - hosts: kube-master
