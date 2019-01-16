@@ -1,5 +1,5 @@
 clean:
-	rm -rf *.log *.zip *.retry vortex-installer
+	rm -rf *.log *.zip *.retry kubecord-installer
 
 submodule:
 	git submodule init && git submodule update
@@ -35,9 +35,9 @@ endif
 all: submodule cluster
 
 config-kubespray:
-	mkdir -p kubespray/inventory/vortex 
-	cp -r inventory/group_vars kubespray/inventory/vortex
-	cp inventory/inventory.ini kubespray/inventory/vortex/hosts.ini
+	mkdir -p kubespray/inventory/kubecord 
+	cp -r inventory/group_vars kubespray/inventory/kubecord
+	cp inventory/inventory.ini kubespray/inventory/kubecord/hosts.ini
 
 # deploy kubernetes with kubespray
 # FIXME make cluster will cause tty pipe line error. Use bash script instead.
@@ -62,7 +62,7 @@ kubecord: config-kubespray
 		-e "@inventory/group_vars/k8s-cluster.yml" \
 		-e "@inventory/group_vars/network-setup.yml" \
 		--inventory inventory/inventory.ini \
-		vortex-dev.yml 2>&1 | tee $(shell date +%F-%H%M%S)-kubecord.log
+		kubecord.yml 2>&1 | tee $(shell date +%F-%H%M%S)-kubecord.log
 
 network-setup:
 	ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
