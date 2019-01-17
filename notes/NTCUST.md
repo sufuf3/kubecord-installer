@@ -256,6 +256,10 @@ $ ethtool -i enp2s0f2 | grep ^driver
 driver: igb
 $ ethtool -i enp2s0f3 | grep ^driver
 driver: igb
+$ ethtool -i eno1 | grep ^driver
+driver: igb
+$ ethtool -i eno2 | grep ^driver
+driver: igb
 $ ethtool -i rename8 | grep ^driver
 driver: ixgbe
 $ ethtool -i rename9 | grep ^driver
@@ -337,4 +341,97 @@ $ head -n 1 /sys/class/net/*/device/sriov_totalvfs
 
 ==> /sys/class/net/rename9/device/sriov_totalvfs <==
 63
+```
+
+
+## Setup SR-IOV VF
+
+### Node1 & Node2
+
+#### Install igb driver
+
+Dowload: https://downloadcenter.intel.com/zh-tw/download/13663/Intel-82575-82580-i350-i2101-linux-
+
+```sh
+$ mkdir ~/igb
+$ tar xvfvz igb-5.3.5.22.tar.gz -C ~/igb
+$ cd ~/igb/igb-5.3.5.22/src
+$ sudo make
+$ sudo make install
+$ ls /lib/modules/`uname -r`/kernel/drivers/net/ethernet/intel
+```
+
+#### modprobe
+```sh
+echo "options igb max_vfs=4,4" | sudo tee -a /etc/modprobe.d/igb.conf
+sudo rmmod igb
+sudo modprobe igb max_vfs=4,4
+echo 4 | sudo tee -a /sys/class/net/enp5s0f0/device/sriov_numvfs
+echo 4 | sudo tee -a /sys/class/net/enp5s0f1/device/sriov_numvfs
+```
+
+```sh
+$ head -n 1 /sys/class/net/*/device/sriov_numvfs
+==> /sys/class/net/enp5s0f0/device/sriov_numvfs <==
+4
+
+==> /sys/class/net/enp5s0f1/device/sriov_numvfs <==
+4
+
+==> /sys/class/net/enp5s0f2/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/enp5s0f3/device/sriov_numvfs <==
+0
+```
+
+### Node3
+
+#### Install ixgbe driver
+
+Ref: https://github.com/sufuf3/kubecord/tree/master/study/DPDK_SRIOV_CNI#ixgbe
+Download: https://downloadcenter.intel.com/zh-tw/download/14687
+
+```sh
+$ mkdir ~/ixgbe
+$ tar xvfvz ixgbe-5.5.3.tar.gz -C ~/ixgbe
+$ cd ~/ixgbe/ixgbe-5.5.3/src
+$ sudo make
+$ sudo make install
+$ ls /lib/modules/`uname -r`/kernel/drivers/net/ethernet/intel
+```
+
+```sh
+echo "options ixgbe max_vfs=60,60" | sudo tee -a /etc/modprobe.d/ixgbe.conf
+sudo rmmod ixgbe
+sudo modprobe ixgbe max_vfs=60,60
+echo 60 | sudo tee -a /sys/class/net/rename8/device/sriov_numvfs
+echo 60 | sudo tee -a /sys/class/net/rename9/device/sriov_numvfs
+```
+
+```sh
+$ head -n 1 /sys/class/net/*/device/sriov_numvfs
+==> /sys/class/net/eno1/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/eno2/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/enp2s0f0/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/enp2s0f1/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/enp2s0f2/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/enp2s0f3/device/sriov_numvfs <==
+0
+
+==> /sys/class/net/rename8/device/sriov_numvfs <==
+60
+
+==> /sys/class/net/rename9/device/sriov_numvfs <==
+60
 ```
