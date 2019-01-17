@@ -26,7 +26,7 @@
 
 ## Quick Start for Testing
 
-- Deploy a vortex on localhost with Vagrant and VirtualBox
+- Deploy a kubeCORD on localhost with Vagrant and VirtualBox
 - Not for production. Test purpose only.
   - [Install Virtualbox](https://www.virtualbox.org/wiki/Downloads)
   - [Install Vagrant](https://www.vagrantup.com/downloads.html)
@@ -48,7 +48,7 @@ cd kubecord-installer && sh deploy-in-vagrant.sh
   - CPU: 8 cores
 - Prepare at least 2 hosts with Ubuntu 16.04
   - One for Ansible Control Machine
-  - At least one for Ansible Managed Node to deploy vortex
+  - At least one for Ansible Managed Node to deploy KubeCORD
 
 
 ### Preparation work on _each host_
@@ -180,17 +180,20 @@ $ cp inventory/host_vars/localhost.yml inventory/host_vars/node-2.yml
 - Use the followings for installing DPDK-OVS & Kubernetes cluster
 
 ```sh
-make vortex-dev
+make kubecord
 ```
 
 P.S. If you want to install DPDK-OVS & Kubernetes cluster step by step, please following these steps:  
 
 ```sh
-# install DPDK-OVS
+# 1. Install DPDK-OVS & support SR-IOV VF
 make network-setup
 
-# install Kubernetes cluster
-make cluster-dev
+# 2. If you want to add VF number before deploy a Kubernetes cluster, Please setup SR-IOV VF
+#    Ref: https://github.com/sufuf3/kubecord/blob/master/docs/setup-kubecord/set-sr-iov.md
+
+# 3. Install Kubernetes cluster
+make cluster
 ```
 
 ### Reset cluster
