@@ -1,0 +1,9 @@
+---
+- name: Install go
+  include_tasks: go-install.yml
+
+- name: Install sriov-cni
+  include_tasks: sriov-cni.yml
+
+- name: Install DPDK-CNI
+  include_tasks: dpdk-cni.yml
