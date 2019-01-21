@@ -5,6 +5,7 @@
 ### Ansible ###
 *.retry
 */inventory.ini
+*/inventory-pro.ini
 
 # keys
 ssh/
