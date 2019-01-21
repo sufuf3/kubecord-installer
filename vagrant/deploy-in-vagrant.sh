@@ -16,4 +16,6 @@ vagrant ssh node-1 --command 'mkdir -p kubecord-installer/inventory/keys'
 vagrant ssh node-1 --command 'cp id_rsa kubecord-installer/inventory/keys/id_rsa'
 vagrant ssh node-1 --command 'cp id_rsa.pub kubecord-installer/inventory/keys/id_rsa.pub'
 
-vagrant ssh node-1 --command 'cd kubecord-installer && cp inventory/inventory-vagrant.ini inventory/inventory.ini && make ansible cluster'
+vagrant ssh node-1 --command 'cd kubecord-installer && cp inventory/inventory-vagrant.ini inventory/inventory.ini'
+vagrant ssh node-1 --command 'cd kubecord-installer && cp inventory/group_vars/network-setup-vagrant.yml inventory/group_vars/network-setup.yml'
+vagrant ssh node-1 --command 'cd kubecord-installer && make ansible cluster'
