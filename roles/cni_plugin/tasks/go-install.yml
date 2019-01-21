@@ -1,8 +1,4 @@
 ---
-- name: Override go_url
-  when: repos_offline == True
-  set_fact:
-    go_download_location: "{{go_offline}}"
 
 - name: Download the Go tarball
   get_url:
