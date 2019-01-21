@@ -9,17 +9,27 @@
     - vpp
     - vpp-lib
 
-- name: Building VPP CNI Library with OVS
-  shell: "{{ item }}"
+- name: Get VPP CNI
+  shell: "{{ GOROOT }}/bin/go get -u {{ item }}"
   with_items:
-    - go get -u github.com/Billy99/user-space-net-plugin
-    - cd ~/go/src/github.com/Billy99/user-space-net-plugin && make install
+    - github.com/Billy99/user-space-net-plugin
+  ignore_errors: True
 
-- name: Build CNI
-  shell: "{{ item }}"
+- name: Building VPP CNI Library with OVS
+  shell: cd ~/go/src/github.com/Billy99/user-space-net-plugin && make install
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+
+- name: Get CNI
+  shell: "{{ GOROOT }}/bin/go get -u {{ item }}"
   with_items:
-    - go get -u github.com/intel/userspace-cni-network-plugin
-    - cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make
+    - github.com/intel/userspace-cni-network-plugin
+  ignore_errors: True
+
+- name: Building DPDK CNI
+  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
 
 - name: Copy dpdk binary file under /opt/cni
   copy:
@@ -39,4 +49,3 @@
     owner: root
     group: root
     mode: 0755
-

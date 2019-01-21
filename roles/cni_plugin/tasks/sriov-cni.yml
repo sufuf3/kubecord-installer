@@ -1,20 +1,15 @@
 ---
 
-# git clone https://github.com/intel/sriov-cni.git
-- name: Git Clone SRIOV-CNI
-  git:
-    repo: 'https://github.com/intel/sriov-cni.git'
-    dest: /src/sriov-cni
+- name: Get SRIOV-CNI
+  shell: "{{ GOROOT }}/bin/go get -u {{ item }}"
+  with_items:
+    - github.com/intel/sriov-cni
+  ignore_errors: True
 
-
-- name: Build SRIOV-CNI
-  shell: cd /src/sriov-cni && ./build
-
+- name: Building SRIOV-CNI
+  shell: cd ~/go/src/github.com/intel/sriov-cni && make build
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
 
 - name: Copy sriov binary file under /opt/cni
-  copy:
-    src: /src/sriov-cni/bin/sriov
-    dest: /opt/cni/bin/sriov
-    owner: root
-    group: root
-    mode: 0755
+  shell: cp /root/go/src/github.com/intel/sriov-cni/build/sriov /opt/cni/bin/sriov
