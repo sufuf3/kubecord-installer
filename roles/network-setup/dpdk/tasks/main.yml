@@ -12,7 +12,7 @@
   when: kernel_module == 'vfio-pci' and ovs_type == 'dpdk'
 
 # Bind dpdk port manually via shell script
-- name: Copy dpdkbind.sh file
+- name: Copy dpdkbind file
   template:
     src: dpdkbind.j2
     dest: "/usr/bin/dpdkbind"
