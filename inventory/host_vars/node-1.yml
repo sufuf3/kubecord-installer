@@ -1,0 +1,11 @@
+---
+
+# Set other_config of Open_vSwitch
+# other_config:dpdk-init=true or try
+dpdk_init: true
+# other_config:dpdk-socket-mem="1024,1024"
+dpdk_socket_mem: "1024"
+# other_config:pmd-cpu-mask=0x2
+cpu_mask: "0x2"
+# other_config:max-idle=30000
+max_idle: 30000

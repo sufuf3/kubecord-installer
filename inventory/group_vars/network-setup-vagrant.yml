@@ -15,17 +15,17 @@ dpdk_version: 17.11.4
 
 # Default hugepage size setting
 # Supported: 1G, 2M
-default_hugepagesz: 1G
+default_hugepagesz: 2M
 
 # Allocate a number of Huge pages
-nr_hugepages: 4
+nr_hugepages: 1024
 
 
 
 ##### SR-IOV setting #####
 
 # If you want to the machine support SR-IOV VF, set sriov as true
-sriov: true
+sriov: false
 
 
 ##### Open vSwitch install #####
@@ -47,8 +47,3 @@ ovs_folder_name: xxx
 
 # igb_uio or vfio-pci
 kernel_module: vfio-pci
-
-##### For K8s CNI plugin install #####
-
-cni_sriov: true
-cni_dpdk: true
