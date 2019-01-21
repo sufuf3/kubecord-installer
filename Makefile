@@ -30,6 +30,13 @@ ansible: submodule
 
 endif
 
+# infrastructure
+.PHONY: vagrant
+vagrant:
+	cd vagrant/ && sh deploy-in-vagrant.sh
+
+vagrant-destroy:
+	cd vagrant/ && vagrant destroy -f
 
 # all: main target workflow
 all: submodule cluster
