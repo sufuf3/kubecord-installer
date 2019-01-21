@@ -197,6 +197,13 @@ make cluster
 
 # 4. Install SR-IOV & DPDK CNI
 make cni-install
+
+# 5. Creating sriov network object
+#    Ref: https://github.com/sufuf3/kubecord/blob/master/study/DPDK_SRIOV_CNI/multus-CNI-test.md#try-multus--sriov
+
+# 6. Create pods
+#    Ref 1: https://github.com/sufuf3/kubecord/blob/master/study/DPDK_SRIOV_CNI/multus-OVS-DPDK.md#testing-with-dpdk-testpmd-application
+#    Ref 2: https://github.com/sufuf3/kubecord/blob/master/study/DPDK_SRIOV_CNI/multus-CNI-test.md#try-multus--sriov
 ```
 
 ### Reset cluster
