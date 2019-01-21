@@ -1,6 +1,6 @@
 
 # Created by https://www.gitignore.io/api/vim,ansible
-# Edit at https://www.gitignore.io/?templates=vim,ansible
+# Edit at https://www.gitignore.io/?templates=vim,ansible,vagrant
 
 ### Ansible ###
 *.retry
@@ -29,5 +29,15 @@ Session.vim
 tags
 # Persistent undo
 [._]*.un~
+
+### Vagrant ###
+# General
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+*.logs
+
+### Vagrant Patch ###
+*.box
 
 # End of https://www.gitignore.io/api/vim,ansible
