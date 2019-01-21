@@ -36,8 +36,10 @@ tags
 
 # Log files (if you are creating logs in debug mode, uncomment this)
 *.logs
+*.log
 
 ### Vagrant Patch ###
 *.box
+*.vmdk
 
 # End of https://www.gitignore.io/api/vim,ansible
