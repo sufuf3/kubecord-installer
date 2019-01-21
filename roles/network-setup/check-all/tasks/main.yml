@@ -35,10 +35,12 @@
 - name: Info | Get CPU info
   shell: cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
   register: cpu_result
+  ignore_errors: True
 
 - name: Info | Print cpu info
   debug:
     msg: "{{ cpu_result.stdout.split('\n') }}"
+  ignore_errors: True
 
 - name: SR-IOV | Get VF info
   shell: head -n 1 /sys/class/net/en[a-z]*/device/sriov_totalvfs

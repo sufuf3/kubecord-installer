@@ -20,3 +20,4 @@
 
 - name: Use the "performance" cpufreq intel_pstate governor
   shell: cpupower -c all frequency-set -g performance
+  ignore_errors: True
