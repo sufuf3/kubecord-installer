@@ -1,0 +1,42 @@
+---
+
+- name: Install VPP
+  shell: cd ~/ && curl -s https://packagecloud.io/install/repositories/fdio/release/script.deb.sh | sudo bash
+
+- name: Install VPP
+  apt: "name={{ item }} state=installed"
+  with_items:
+    - vpp
+    - vpp-lib
+
+- name: Building VPP CNI Library with OVS
+  shell: "{{ item }}"
+  with_items:
+    - go get -u github.com/Billy99/user-space-net-plugin
+    - cd ~/go/src/github.com/Billy99/user-space-net-plugin && make install
+
+- name: Build CNI
+  shell: "{{ item }}"
+  with_items:
+    - go get -u github.com/intel/userspace-cni-network-plugin
+    - cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make
+
+- name: Copy dpdk binary file under /opt/cni
+  copy:
+    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/userspace/userspace
+    dest: /opt/cni/bin/userspace
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create NetworkAttachmentDefinition of userspace-network object
+  shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/605483f59973947aa15d981da1515a55fe2f5d2b/examples/crd-userspace-net-ovs-no-ipam.yaml
+
+- name: Copy get-prefix.sh script to /var/lib/cni/vhostuser/
+  copy:
+    src: https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/9c2dc4306398aace5c0aa8037e332b24bd00df68/tests/get-prefix.sh
+    dest: /var/lib/cni/vhostuser/get-prefix.sh
+    owner: root
+    group: root
+    mode: 0755
+

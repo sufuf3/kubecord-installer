@@ -4,6 +4,8 @@
 
 - name: Install sriov-cni
   include_tasks: sriov-cni.yml
+  when: cni_sriov
 
 - name: Install DPDK-CNI
   include_tasks: dpdk-cni.yml
+  when: cni_dpdk

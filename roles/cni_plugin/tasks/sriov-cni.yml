@@ -1,0 +1,20 @@
+---
+
+# git clone https://github.com/intel/sriov-cni.git
+- name: Git Clone SRIOV-CNI
+  git:
+    repo: 'https://github.com/intel/sriov-cni.git'
+    dest: /src/sriov-cni
+
+
+- name: Build SRIOV-CNI
+  shell: cd /src/sriov-cni && ./build
+
+
+- name: Copy sriov binary file under /opt/cni
+  copy:
+    src: /src/sriov-cni/bin/sriov
+    dest: /opt/cni/bin/sriov
+    owner: root
+    group: root
+    mode: 0755
