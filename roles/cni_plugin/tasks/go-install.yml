@@ -26,15 +26,15 @@
   when: go_version|failed or go_version.stdout != go_version_target
 
 - name: Add the Go bin directory to the PATH environment variable for all users
-  copy:
-    src: go-bin.sh
-    dest: /etc/profile.d
+  shell: "{{ item }}"
+  with_items:
+    - echo 'export GOROOT=/usr/local/go' | sudo tee -a ~/.bashrc
 
 - name: Set GOPATH for all users
-  copy:
-    src: go-path.sh
-    dest: /etc/profile.d
-  when: set_go_path
+  shell: "{{ item }}"
+  with_items:
+    - echo 'export GOPATH=$HOME/go' | sudo tee -a ~/.bashrc
+    - echo 'export PATH=/home/$USER/protoc/bin:$PATH:$GOROOT/bin:$GOPATH/bin' | sudo tee -a ~/.bashrc
 
 # create directories for go/src if it doesn't exist
 - name: Create /home/$USER/go/src dir
