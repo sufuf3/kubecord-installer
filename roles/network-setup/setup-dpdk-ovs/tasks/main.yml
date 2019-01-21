@@ -7,5 +7,5 @@
     - ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-socket-mem={{ dpdk_socket_mem }}
     - ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask={{ cpu_mask }}
     - ovs-vsctl --no-wait set Open_vSwitch . other_config:max-idle={{ max_idle }}
-    - ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
+    - ovs-vsctl --no-wait add-br br0 -- set bridge br0 datapath_type=netdev
   when: ovs_type == 'dpdk'

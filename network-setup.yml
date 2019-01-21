@@ -7,6 +7,7 @@
     - { role: network-setup/grub, when: default_hugepagesz == '1G' or sriov == 'true'}
     - { role: network-setup/dpdk, when: ovs_type == 'dpdk', tags: dpdk }
     - { role: network-setup/dpdk-ovs, when: ovs_type == 'dpdk', tags: dpdk-ovs }
+    - { role: network-setup/setup-dpdk-ovs, when: ovs_type == 'dpdk', tags: dpdk-ovs }
     - { role: network-setup/check-all, when: ovs_type == 'dpdk', tags: dpdk-ovs }
 
 
