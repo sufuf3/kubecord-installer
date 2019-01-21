@@ -41,11 +41,7 @@
 
 - name: Create NetworkAttachmentDefinition of userspace-network object
   shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/605483f59973947aa15d981da1515a55fe2f5d2b/examples/crd-userspace-net-ovs-no-ipam.yaml
+  when: inventory_hostname == groups['kube-master'][0]
 
 - name: Copy get-prefix.sh script to /var/lib/cni/vhostuser/
-  copy:
-    src: https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/9c2dc4306398aace5c0aa8037e332b24bd00df68/tests/get-prefix.sh
-    dest: /var/lib/cni/vhostuser/get-prefix.sh
-    owner: root
-    group: root
-    mode: 0755
+  shell: wget -P /var/lib/cni/vhostuser/ https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/9c2dc4306398aace5c0aa8037e332b24bd00df68/tests/get-prefix.sh
