@@ -47,3 +47,8 @@ ovs_folder_name: xxx
 
 # igb_uio or vfio-pci
 kernel_module: vfio-pci
+
+##### For K8s CNI plugin install #####
+
+cni_sriov: true
+cni_dpdk: true

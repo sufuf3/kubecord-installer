@@ -194,6 +194,9 @@ make network-setup
 
 # 3. Install Kubernetes cluster
 make cluster
+
+# 4. Install SR-IOV & DPDK CNI
+make cni-install
 ```
 
 ### Reset cluster

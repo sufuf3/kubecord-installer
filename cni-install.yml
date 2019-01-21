@@ -1,0 +1,14 @@
+---
+
+- hosts: network-setup
+  become: yes
+  roles:
+    - { role: cni_plugin, tags: cni_plugin }
+
+
+# The inventory.sample is
+# [network-setup]
+# X.X.X.X
+# X.X.X.X
+
+# try: `ansible-playbook -e "@inventory/group_vars/network-setup.yml" --inventory inventory/inventory.ini cni-install.yml -vvvv`
