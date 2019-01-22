@@ -26,18 +26,18 @@
     - github.com/intel/userspace-cni-network-plugin
   ignore_errors: True
 
-- name: Building DPDK CNI
-  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+#- name: Building DPDK CNI
+#  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make
+#  environment:
+#    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
 
-- name: Copy dpdk binary file under /opt/cni
-  copy:
-    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/userspace/userspace
-    dest: /opt/cni/bin/userspace
-    owner: root
-    group: root
-    mode: 0755
+#- name: Copy dpdk binary file under /opt/cni
+#  copy:
+#    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/userspace/userspace
+#    dest: /opt/cni/bin/userspace
+#    owner: root
+#    group: root
+#    mode: 0755
 
 - name: Create NetworkAttachmentDefinition of userspace-network object
   shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/605483f59973947aa15d981da1515a55fe2f5d2b/examples/crd-userspace-net-ovs-no-ipam.yaml
