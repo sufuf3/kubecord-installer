@@ -77,6 +77,12 @@ network-setup:
 		--inventory inventory/inventory.ini \
 		network-setup.yml 2>&1 | tee $(shell date +%F-%H%M%S)-network-setup.log
 
+network-setup-reset:
+	ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
+		-e "@inventory/group_vars/network-setup.yml" \
+		--inventory inventory/inventory.ini \
+		network-setup-reset.yml 2>&1 | tee $(shell date +%F-%H%M%S)-network-setup-reset.log
+
 cni-install:
 	ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook \
 		-e "@inventory/group_vars/network-setup.yml" \
