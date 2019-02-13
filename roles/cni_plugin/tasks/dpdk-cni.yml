@@ -8,6 +8,12 @@
   with_items:
     - vpp
     - vpp-lib
+    - vpp-plugins
+    - vpp-dbg
+    - vpp-dev
+    - vpp-api-java
+    - vpp-api-python
+    - vpp-api-lua
 
 - name: Get VPP CNI
   shell: "{{ GOROOT }}/bin/go get -u {{ item }}"
@@ -21,26 +27,30 @@
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
 
 - name: Get CNI
-  shell: "{{ GOROOT }}/bin/go get -u {{ item }}"
-  with_items:
-    - github.com/intel/userspace-cni-network-plugin
+  shell: mkdir -p ~/go/src/github.com/intel && git clone https://github.com/intel/userspace-cni-network-plugin
   ignore_errors: True
 
-#- name: Building DPDK CNI
-#  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make
-#  environment:
-#    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+# From: https://github.com/intel/userspace-cni-network-plugin/tree/v1.1
+- name: Building DPDK CNI
+  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && git checkout v1.1 && ./build
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+  ignore_errors: True
 
-#- name: Copy dpdk binary file under /opt/cni
-#  copy:
-#    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/userspace/userspace
-#    dest: /opt/cni/bin/userspace
-#    owner: root
-#    group: root
-#    mode: 0755
+- name: Copy dpdk binary file under /opt/cni
+  copy:
+    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/bin/vhostuser
+    dest: /opt/cni/bin/vhostuser
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: yes
+
+- name: Copy get-prefix.sh script to /var/lib/cni/vhostuser/
+  shell: wget -P /opt/cni/bin/ https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/v1.1/tests/ovs-config.py
 
 - name: Create NetworkAttachmentDefinition of userspace-network object
-  shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/605483f59973947aa15d981da1515a55fe2f5d2b/examples/crd-userspace-net-ovs-no-ipam.yaml
+  shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/v1.1/examples/crd-vhostuser-net.yaml
   when: inventory_hostname == groups['kube-master'][0]
 
 - name: Copy get-prefix.sh script to /var/lib/cni/vhostuser/
