@@ -224,7 +224,7 @@ ansible-playbook -e "@inventory/group_vars/network-setup.yml" --inventory invent
 
 ---
 
-## Check Kubernetes Cluster
+## Check KubCORD Cluster
 
 - ssh to _one of k8s master_
 
@@ -278,7 +278,55 @@ $ systemctl status ovs-vswitchd.service
    Active: active (running) since 二 2018-09-04 11:34:46 CST; 1min 23s ago
 
 $ kubectl get pod -n kube-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-5b56bfc96c-klp2z   1/1     Running   0          21d
+calico-node-5828t                          1/1     Running   0          21d
+calico-node-8z2vn                          1/1     Running   0          21d
+coredns-788d98cc7b-49p65                   0/1     Pending   0          21d
+coredns-788d98cc7b-sgmq7                   0/1     Pending   0          21d
+coredns-788d98cc7b-t4g9v                   1/1     Running   0          21d
+coredns-788d98cc7b-zzr9d                   1/1     Running   0          21d
+dns-autoscaler-66b95c57d9-nw7xs            1/1     Running   0          21d
+kube-apiserver-node-1                      1/1     Running   0          21d
+kube-apiserver-node-2                      1/1     Running   0          21d
+kube-controller-manager-node-1             1/1     Running   0          21d
+kube-controller-manager-node-2             1/1     Running   0          21d
+kube-multus-ds-amd64-vd5vt                 1/1     Running   0          21d
+kube-multus-ds-amd64-w85b8                 1/1     Running   0          21d
+kube-proxy-rmv4q                           1/1     Running   0          21d
+kube-proxy-scj4k                           1/1     Running   0          21d
+kube-scheduler-node-1                      1/1     Running   0          21d
+kube-scheduler-node-2                      1/1     Running   0          21d
+kubernetes-dashboard-5db4d9f45f-r485h      1/1     Running   0          21d
 
+$ kubectl get crd
+NAME                                             CREATED AT
+network-attachment-definitions.k8s.cni.cncf.io   2019-01-22T10:50:23Z
+
+$ kubectl get network-attachment-definition
+NAME                   AGE
+vhostuser-networkobj   5m
+
+$ ls -l /opt/cni/bin/
+total 140688
+-rwxr-xr-x 1 root root  3890407 Aug 17  2017 bridge
+-rwxr-xr-x 1 root root 28049984 Jan 22 10:49 calico
+-rwxr-xr-x 1 root root 27341824 Jan 22 10:49 calico-ipam
+-rwxr-xr-x 1 root root  9921982 Aug 17  2017 dhcp
+-rwxr-xr-x 1 root root  2814104 Jan 22 10:49 flannel
+-rwxr-xr-x 1 root root  2991965 Jan 22 10:49 host-local
+-rwxr-xr-x 1 root root  3475802 Aug 17  2017 ipvlan
+-rwxr-xr-x 1 root root  3026388 Jan 22 10:49 loopback
+-rwxr-xr-x 1 root root  3520724 Aug 17  2017 macvlan
+-rwxr-xr-x 1 root root 35071384 Jan 22 10:50 multus
+-rw-r--r-- 1 root root     2740 Feb 13 07:16 ovs-config.py
+-rwxr-xr-x 1 root root  3470464 Jan 22 10:49 portmap
+-rwxr-xr-x 1 root root  3877986 Aug 17  2017 ptp
+-rwxr-xr-x 1 root root  2605279 Aug 17  2017 sample
+-rwxr-xr-x 1 root root  3897072 Jan 22 11:05 sriov
+-rwxr-xr-x 1 root root  2808402 Aug 17  2017 tuning
+-rwxr-xr-x 1 root root  3784452 Feb 13 07:16 vhostuser
+-rwxr-xr-x 1 root root  3475750 Aug 17  2017 vlan
 ```
 
 ---
