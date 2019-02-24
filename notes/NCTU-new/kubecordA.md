@@ -6,29 +6,29 @@ ip: 140.113.X.171
 
 ### Inventory file
 ```
-kubecordA ansible_ssh_host=140.113.X.171 ip=140.113.X.171
+kubecord-a ansible_ssh_host=140.113.X.171 ip=140.113.X.171
 
 [local]
 localhost ansible_connection=local
 
 [kube-master]
-kubecordA
+kubecord-a
 
 [etcd]
-kubecordA
+kubecord-a
 
 [kube-node]
-kubecordA
+kubecord-a
 
 [k8s-cluster:children]
 kube-master
 kube-node
 
 [vault]
-kubecordA
+kubecord-a
 
 [network-setup]
-kubecordA
+kubecord-a
 
 [all:vars]
 ansible_port=22
