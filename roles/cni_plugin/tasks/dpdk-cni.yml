@@ -1,19 +1,42 @@
 ---
 
-- name: Install VPP
-  shell: cd ~/ && curl -s https://packagecloud.io/install/repositories/fdio/release/script.deb.sh | sudo bash
+# From: https://github.com/intel/userspace-cni-network-plugin/tree/374f99ce4cff0b75575a1f4d67453023ec08c33d
+- name: Get CNI
+  shell: mkdir -p ~/go/src/github.com/intel && cd ~/go/src/github.com/intel && git clone https://github.com/intel/userspace-cni-network-plugin.git
+  ignore_errors: True
+
+- name: Building DPDK CNI
+  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && make install && make
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+  ignore_errors: True
+
+- name: Copy dpdk binary file under /opt/cni
+  copy:
+    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/userspace/userspace
+    dest: /opt/cni/bin/userspace
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: yes
+
+- name: Get VPP source
+  shell: cd ~/ && git clone https://gerrit.fd.io/r/vpp
+  ignore_errors: True
 
 - name: Install VPP
-  apt: "name={{ item }} state=installed"
+  shell: "{{ item }}"
   with_items:
-    - vpp
-    - vpp-lib
-    - vpp-plugins
-    - vpp-dbg
-    - vpp-dev
-    - vpp-api-java
-    - vpp-api-python
-    - vpp-api-lua
+    - cd ~/vpp && git checkout v18.07 && sudo ./extras/vagrant/build.sh
+    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-lib_18.07-release_amd64.deb
+    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp_18.07-release_amd64.deb
+    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-dev_18.07-release_amd64.deb
+    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-plugins_18.07-release_amd64.deb
+    - sudo systemctl daemon-reload && sudo systemctl restart vpp
+    - cd ~/vpp/extras/libmemif && ./bootstrap
+    - cd ~/vpp/extras/libmemif && ./configure
+    - cd ~/vpp/extras/libmemif && sudo make install
+    - mkdir -p /var/lib/cni/vhostuser/
 
 - name: Get VPP CNI
   shell: "{{ GOROOT }}/bin/go get -u {{ item }}"
@@ -26,32 +49,25 @@
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
 
-- name: Get CNI
-  shell: mkdir -p ~/go/src/github.com/intel && git clone https://github.com/intel/userspace-cni-network-plugin
-  ignore_errors: True
-
-# From: https://github.com/intel/userspace-cni-network-plugin/tree/v1.1
-- name: Building DPDK CNI
-  shell: cd ~/go/src/github.com/intel/userspace-cni-network-plugin && git checkout v1.1 && ./build
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
-  ignore_errors: True
-
-- name: Copy dpdk binary file under /opt/cni
+- name: Copy get-prefix.sh script to /opt/cni/bin/
   copy:
-    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/bin/vhostuser
-    dest: /opt/cni/bin/vhostuser
+    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/tests/get-prefix.sh
+    dest: /opt/cni/bin/
     owner: root
     group: root
     mode: 0755
     remote_src: yes
 
 - name: Copy get-prefix.sh script to /var/lib/cni/vhostuser/
-  shell: wget -P /opt/cni/bin/ https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/v1.1/tests/ovs-config.py
+  copy:
+    src: ~/go/src/github.com/intel/userspace-cni-network-plugin/tests/get-prefix.sh
+    dest: /var/lib/cni/vhostuser/
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: yes
 
 - name: Create NetworkAttachmentDefinition of userspace-network object
-  shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/v1.1/examples/crd-vhostuser-net.yaml
+  shell: kubectl create -f https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/374f99ce4cff0b75575a1f4d67453023ec08c33d/examples/crd-userspace-net-ovs-no-ipam.yaml
   when: inventory_hostname == groups['kube-master'][0]
 
-- name: Copy get-prefix.sh script to /var/lib/cni/vhostuser/
-  shell: wget -P /var/lib/cni/vhostuser/ https://raw.githubusercontent.com/intel/userspace-cni-network-plugin/9c2dc4306398aace5c0aa8037e332b24bd00df68/tests/get-prefix.sh
