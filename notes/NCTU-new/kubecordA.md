@@ -147,7 +147,7 @@ head -n 1 /sys/class/net/*/device/sriov_totalvfs
 
 ## Setup SR-IOV VF
 
-### nctu-cord3
+### kubecord-a
 
 #### Install i40e driver
 
@@ -160,6 +160,176 @@ $ cd ~/i40e/i40e-2.4.10/src
 $ sudo make
 $ sudo make install
 $ ls /lib/modules/`uname -r`/kernel/drivers/net/ethernet/intel
+```
+
+#### Update Firmware
+
+Download: https://downloadcenter.intel.com/download/24769/Non-Volatile-Memory-NVM-Update-Utility-for-Intel-Ethernet-Network-Adapter-710-Series?product=82947
+
+```sh
+$ mkdir ~/NVM
+
+$ unzip NVMUpdatePackage_710_Series.zip
+Archive:  NVMUpdatePackage_710_Series.zip
+   creating: 710_Series/
+  inflating: 710_Series/XL710_NVMUpdatePackage_v6_80_EFI.zip
+  inflating: 710_Series/XL710_NVMUpdatePackage_v6_80_ESX.tar.gz
+  inflating: 710_Series/XL710_NVMUpdatePackage_v6_80_FreeBSD.tar.gz
+  inflating: 710_Series/XL710_NVMUpdatePackage_v6_80_Linux.tar.gz
+  inflating: 710_Series/XL710_NVMUpdatePackage_v6_80_Windows.exe
+
+$ mv ~/710_Series/XL710_NVMUpdatePackage_v6_80_Linux.tar.gz ~/.
+$ tar xvfvz XL710_NVMUpdatePackage_v6_80_Linux.tar.gz -C ~/NVM/
+
+$ cd ~/NVM/XL710/Linux_x64
+$ chmod 755 nvmupdate64e
+$ chmod 755 nvmupdate.cfg
+$ ls -al | grep nvmupdate
+-rwxr-xr-x 1 winlab winlab 4179827 Nov 13 11:24 nvmupdate64e
+-rwxr-xr-x 1 winlab winlab   22284 Nov 13 11:18 nvmupdate.cfg
+
+$ sudo ./nvmupdate64e
+
+Intel(R) Ethernet NVM Update Tool
+NVMUpdate version 1.32.20.30
+Copyright (C) 2013 - 2018 Intel Corporation.
+
+
+WARNING: To avoid damage to your device, do not stop the update or reboot or power off the system during this update.
+Inventory in progress. Please wait [****|.....]
+
+
+Num Description                          Ver.(hex)  DevId S:B    Status
+=== ================================== ============ ===== ====== ==============
+01) Intel(R) Ethernet Converged          5.02(5.02)  1572 00:001 Update
+    Network Adapter X710                                         available
+02) Intel(R) I210 Gigabit Network        3.05(3.05)  1533 00:008 Update not
+    Connection                                                   available
+03) Intel(R) I210 Gigabit Network        3.05(3.05)  1533 00:009 Update not
+    Connection                                                   available
+
+Options: Adapter Index List (comma-separated), [A]ll, e[X]it
+Enter selection:a
+Would you like to back up the NVM images? [Y]es/[N]o: y
+Update in progress. This operation may take several minutes.
+[**-.......]
+
+
+Num Description                          Ver.(hex)  DevId S:B    Status
+=== ================================== ============ ===== ====== ==============
+01) Intel(R) Ethernet Converged         6.128(6.80)  1572 00:001 Update
+    Network Adapter X710                                         successful
+02) Intel(R) I210 Gigabit Network        3.05(3.05)  1533 00:008 Update not
+    Connection                                                   available
+03) Intel(R) I210 Gigabit Network        3.05(3.05)  1533 00:009 Update not
+    Connection                                                   available
+
+Reboot is required to complete the update process.
+
+Tool execution completed with the following status: All operations completed successfully.
+Press any key to exit.
+
+$ sudo update-initramfs -u
+update-initramfs: Generating /boot/initrd.img-4.4.0-142-generic
+W: Possible missing firmware /lib/firmware/ast_dp501_fw.bin for module ast
+W: mdadm: /etc/mdadm/mdadm.conf defines no arrays.
+
+$ sudo reboot
+```
+
+##### Vilified
+
+- Before (No Install New i40e driver & Update Firmware)
+
+```sh
+$ ethtool -i ens11f0
+driver: i40e
+version: 1.4.25-k
+firmware-version: 5.02 0x80002248 1.1313.0
+expansion-rom-version:
+bus-info: 0000:01:00.0
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
+
+$ modinfo i40e
+filename:       /lib/modules/4.4.0-131-generic/kernel/drivers/net/ethernet/intel/i40e/i40e.ko
+version:        1.4.25-k
+license:        GPL
+description:    Intel(R) Ethernet Connection XL710 Network Driver
+author:         Intel Corporation, <e1000-devel@lists.sourceforge.net>
+srcversion:     8FEABE523F015849EA52A4B
+alias:          pci:v00008086d00001588sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001587sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D2sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D1sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D0sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037CFsv*sd*bc*sc*i*
+alias:          pci:v00008086d000037CEsv*sd*bc*sc*i*
+alias:          pci:v00008086d00001587sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001589sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001586sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001585sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001584sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001583sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001581sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001580sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001574sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001572sv*sd*bc*sc*i*
+depends:        ptp,vxlan
+retpoline:      Y
+intree:         Y
+vermagic:       4.4.0-131-generic SMP mod_unload modversions retpoline
+parm:           debug:Debug level (0=none,...,16=all) (int)
+```
+
+- After
+
+```sh
+$ ethtool -i ens11f0
+driver: i40e
+version: 2.4.10
+firmware-version: 6.80 0x80003ce6 1.1313.0
+expansion-rom-version:
+bus-info: 0000:01:00.0
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
+
+$ modinfo i40e
+filename:       /lib/modules/4.4.0-131-generic/updates/drivers/net/ethernet/intel/i40e/i40e.ko
+version:        2.4.10
+license:        GPL
+description:    Intel(R) 40-10 Gigabit Ethernet Connection Network Driver
+author:         Intel Corporation, <e1000-devel@lists.sourceforge.net>
+srcversion:     3977C21019A3C4865FF253A
+alias:          pci:v00008086d0000158Bsv*sd*bc*sc*i*
+alias:          pci:v00008086d0000158Asv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D3sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D2sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D1sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037D0sv*sd*bc*sc*i*
+alias:          pci:v00008086d000037CFsv*sd*bc*sc*i*
+alias:          pci:v00008086d000037CEsv*sd*bc*sc*i*
+alias:          pci:v00008086d00001588sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001587sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001589sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001586sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001585sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001584sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001583sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001581sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001580sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001574sv*sd*bc*sc*i*
+alias:          pci:v00008086d00001572sv*sd*bc*sc*i*
+depends:        ptp,vxlan
+retpoline:      Y
+vermagic:       4.4.0-131-generic SMP mod_unload modversions retpoline
+parm:           debug:Debug level (0=none,...,16=all) (int)
 ```
 
 #### modprobe
