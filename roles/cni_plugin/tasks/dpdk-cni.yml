@@ -20,22 +20,26 @@
     mode: 0755
     remote_src: yes
 
-- name: Get VPP source
-  shell: cd ~/ && git clone https://gerrit.fd.io/r/vpp
-  ignore_errors: True
+#- name: Get VPP source
+#  shell: cd ~/ && git clone https://gerrit.fd.io/r/vpp
+#  ignore_errors: True
 
-- name: Install VPP
+#- name: Install VPP
+#  shell: "{{ item }}"
+#  with_items:
+#    - cd ~/vpp && git checkout v18.07 && sudo ./extras/vagrant/build.sh
+#    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-lib_18.07-release_amd64.deb
+#    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp_18.07-release_amd64.deb
+#    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-dev_18.07-release_amd64.deb
+#    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-plugins_18.07-release_amd64.deb
+#    - sudo systemctl daemon-reload && sudo systemctl restart vpp
+#    - cd ~/vpp/extras/libmemif && ./bootstrap
+#    - cd ~/vpp/extras/libmemif && ./configure
+#    - cd ~/vpp/extras/libmemif && sudo make install
+
+- name: Mkdir /var/lib/cni/vhostuser/
   shell: "{{ item }}"
   with_items:
-    - cd ~/vpp && git checkout v18.07 && sudo ./extras/vagrant/build.sh
-    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-lib_18.07-release_amd64.deb
-    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp_18.07-release_amd64.deb
-    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-dev_18.07-release_amd64.deb
-    - cd ~/vpp && sudo dpkg -i ~/vpp/build-root/vpp-plugins_18.07-release_amd64.deb
-    - sudo systemctl daemon-reload && sudo systemctl restart vpp
-    - cd ~/vpp/extras/libmemif && ./bootstrap
-    - cd ~/vpp/extras/libmemif && ./configure
-    - cd ~/vpp/extras/libmemif && sudo make install
     - mkdir -p /var/lib/cni/vhostuser/
 
 - name: Get VPP CNI
