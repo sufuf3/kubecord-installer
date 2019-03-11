@@ -47,7 +47,7 @@ bin_dir: /usr/local/bin
 #cloud_provider:
 
 ## kubeadm deployment mode
-kubeadm_enabled: true
+kubeadm_enabled: false
 
 # Skip alert information
 skip_non_kubeadm_warning: false
