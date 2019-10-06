@@ -2,7 +2,8 @@ clean:
 	rm -rf *.log *.zip *.retry kubecord-installer
 
 submodule:
-	git submodule init && git submodule update
+	git submodule init && git submodule update && \
+	sed -i "s/ansible>=2.7.6/ansible==2.7.6/g" kubespray/requirements.txt
 
 .PHONY: ansible
 UNAME := $(shell uname)
